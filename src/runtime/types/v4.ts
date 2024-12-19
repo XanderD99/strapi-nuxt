@@ -31,7 +31,7 @@ export interface Strapi4RequestParams<T> {
   locale?: StrapiLocale
 }
 
-type StrapiV5RequestPopulateParams<T> = Pick<Strapi4RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
+type Strapi4RequestPopulateParams<T> = Pick<Strapi4RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
 
 // Unified type for Strapi populate, combining both string paths and nested objects.
 type Strapi4RequestPopulateParam<T> =
@@ -39,8 +39,8 @@ type Strapi4RequestPopulateParam<T> =
   | { [K in keyof T]?: // Nested object population.
     T[K] extends object
       ? T[K] extends Array<infer I>
-        ? Strapi4RequestPopulateParam<I> | StrapiV5RequestPopulateParams<I>
-        : Strapi4RequestPopulateParam<T[K]> | StrapiV5RequestPopulateParams<T[K]>
+        ? Strapi4RequestPopulateParam<I> | Strapi4RequestPopulateParams<I>
+        : Strapi4RequestPopulateParam<T[K]> | Strapi4RequestPopulateParams<T[K]>
       : never
   }
   | StrapiRequestParamPopulate<T> // String paths like "field.subfield".

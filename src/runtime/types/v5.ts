@@ -11,7 +11,7 @@ export interface Strapi5Error {
 
 export interface Strapi5RequestParams<T> {
   fields?: Array<StrapiRequestParamField<T>>
-  populate?: StrapiV5RequestPopulateParam<T>
+  populate?: Strapi5RequestPopulateParam<T>
   sort?: StrapiRequestParamSort<T> | Array<StrapiRequestParamSort<T>>
   pagination?: PaginationByOffset | PaginationByPage
   filters?: Record<string, unknown>
@@ -19,16 +19,16 @@ export interface Strapi5RequestParams<T> {
   locale?: StrapiLocale | null
 }
 
-type StrapiV5RequestPopulateParams<T> = Pick<Strapi5RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
+type Strapi5RequestPopulateParams<T> = Pick<Strapi5RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
 
 // Unified type for Strapi populate, combining both string paths and nested objects.
-type StrapiV5RequestPopulateParam<T> =
+type Strapi5RequestPopulateParam<T> =
   | '*' // Populate all relations.
   | { [K in keyof T]?: // Nested object population.
     T[K] extends object
       ? T[K] extends Array<infer I>
-        ? StrapiV5RequestPopulateParam<I> | StrapiV5RequestPopulateParams<I>
-        : StrapiV5RequestPopulateParam<T[K]> | StrapiV5RequestPopulateParams<T[K]>
+        ? Strapi5RequestPopulateParam<I> | Strapi5RequestPopulateParams<I>
+        : Strapi5RequestPopulateParam<T[K]> | Strapi5RequestPopulateParams<T[K]>
       : never
   }
   | StrapiRequestParamPopulate<T> // String paths like "field.subfield".
