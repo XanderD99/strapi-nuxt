@@ -23,13 +23,28 @@ export interface PaginationByOffset {
 
 export interface Strapi4RequestParams<T> {
   fields?: Array<StrapiRequestParamField<T>>
-  populate?: '*' | StrapiRequestParamPopulate<T> | Array<StrapiRequestParamPopulate<T>>
+  populate?: Strapi4RequestPopulateParam<T>
   sort?: StrapiRequestParamSort<T> | Array<StrapiRequestParamSort<T>>
   pagination?: PaginationByOffset | PaginationByPage
   filters?: Record<string, unknown>
   publicationState?: 'live' | 'preview'
   locale?: StrapiLocale
 }
+
+type StrapiV5RequestPopulateParams<T> = Pick<Strapi4RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
+
+// Unified type for Strapi populate, combining both string paths and nested objects.
+type Strapi4RequestPopulateParam<T> =
+  | '*' // Populate all relations.
+  | { [K in keyof T]?: // Nested object population.
+    T[K] extends object
+      ? T[K] extends Array<infer I>
+        ? Strapi4RequestPopulateParam<I> | StrapiV5RequestPopulateParams<I>
+        : Strapi4RequestPopulateParam<T[K]> | StrapiV5RequestPopulateParams<T[K]>
+      : never
+  }
+  | StrapiRequestParamPopulate<T> // String paths like "field.subfield".
+  | Array<StrapiRequestParamPopulate<T>> // Array of string paths.
 
 export interface Strapi4ResponseData<T> {
   id: number

@@ -11,13 +11,28 @@ export interface Strapi5Error {
 
 export interface Strapi5RequestParams<T> {
   fields?: Array<StrapiRequestParamField<T>>
-  populate?: '*' | StrapiRequestParamPopulate<T> | Array<StrapiRequestParamPopulate<T>>
+  populate?: StrapiV5RequestPopulateParam<T>
   sort?: StrapiRequestParamSort<T> | Array<StrapiRequestParamSort<T>>
   pagination?: PaginationByOffset | PaginationByPage
   filters?: Record<string, unknown>
   status?: 'published' | 'draft'
   locale?: StrapiLocale | null
 }
+
+type StrapiV5RequestPopulateParams<T> = Pick<Strapi5RequestParams<T>, 'fields' | 'sort' | 'populate' | 'filters'>
+
+// Unified type for Strapi populate, combining both string paths and nested objects.
+type StrapiV5RequestPopulateParam<T> =
+  | '*' // Populate all relations.
+  | { [K in keyof T]?: // Nested object population.
+    T[K] extends object
+      ? T[K] extends Array<infer I>
+        ? StrapiV5RequestPopulateParam<I> | StrapiV5RequestPopulateParams<I>
+        : StrapiV5RequestPopulateParam<T[K]> | StrapiV5RequestPopulateParams<T[K]>
+      : never
+  }
+  | StrapiRequestParamPopulate<T> // String paths like "field.subfield".
+  | Array<StrapiRequestParamPopulate<T>> // Array of string paths.
 
 export interface StrapiSystemFields {
   documentId: string
